@@ -237,7 +237,8 @@ end;
 procedure TWebFloodInsights.WebFloodInsightsWebActionItem4Action(
   Sender: TObject; Request: TWebRequest; Response: TWebResponse;
   var Handled: Boolean);
-  var sRetMsg: string;
+  var
+  //sRetMsg: string;
   TempFloodMap: TFloodMap;
 begin
   try
@@ -257,6 +258,7 @@ begin
      // TempFloodMap.WriteToLogFile('End ParseConfiguration ');
 
       //set global variable
+     { No needs to validate the flood service: it is free for respotting
       TempFloodMap.SERVICE_ID    := 1;
       TempFloodMap.WSDL_LOCATION := 'http://localhost/WSSubscriptionGalaxy/SubscriptionService.asmx/';
       TempFloodMap.WS_PIN        := '0x0100F20CCD0C9B0A8144B434BFA6DBBCF081A977AC8ADA8D99E121DCFBC7112A50B0DA261B7CD314F2AAB2996A5B';
@@ -271,7 +273,7 @@ begin
       TempFloodMap.WriteToLogFile('End UserHasAccess ');
 
       if (Pos('ERROR',sRetMsg) > 0) or (Pos('Error',sRetMsg) > 0) or (Pos('NOTICE',sRetMsg) > 0) then
-        raise Exception.Create(sRetMsg);
+        raise Exception.Create(sRetMsg);    }
 
       //read client request in local variables
       TempFloodMap.GMtxtText             := Request.QueryFields.Values['txtText'];
@@ -310,18 +312,19 @@ begin
 
       //log the trasaction
       //log the trasaction
+      {  now needs update flood usage for respoting it is free
       if TempFloodMap.gUsageFlag then
       begin
          sRetMsg := TempFloodMap.AddServiceUsage(1,2); //success
          if sRetMsg <> 'Success' then raise Exception.Create(sRetMsg);
-      end;
+      end;   }
       TempFloodMap.WriteToLogFile('Success GetSpottedMapInfo()');
 
     except
       on E: Exception do
       begin
-        sRetMsg := TempFloodMap.AddServiceUsage(2,2); //bad
-        Response.Content := 'Error: '+ E.Message;
+       { sRetMsg := TempFloodMap.AddServiceUsage(2,2); //bad
+        Response.Content := 'Error: '+ E.Message;    }
         TempFloodMap.WriteToLogFile('WebActionItem4 Exception: ' + E.Message);
       end;
     end;

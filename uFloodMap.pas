@@ -297,6 +297,7 @@ begin
       //WriteToLogFile(GeoCodeURL + '?' + GeoCodeQueryStr);
 
       //XMLStr := FidHTTP.Get(GeoCodeURL + '?' + GeoCodeQueryStr);
+       WriteToLogFile('GetInfo Geocoding');
       xmlStr := httpGet(GeoCodeURL + '?' + GeoCodeQueryStr);
       //if nothing is returned, raise exception to be passed to user. This never happens
       //WriteToLogFile('Geocoding Return XML:');
@@ -474,11 +475,12 @@ begin
       //instantiate the HTTP client to run HttpGet for getting the map
       //FidHTTP := TidHTTP.Create(self);
 
-      WriteToLogFile('GetMap Call:');
+      //WriteToLogFile('GetMap Call:');
       //WriteToLogFile(RiskMeterURL + '?' +RiskMeterQueryStr);
 
       //run the HttpGet to get the XML result into XMLStr
       //XMLStr := FidHTTP.Get(RiskMeterURL + '?' +RiskMeterQueryStr);
+      WriteToLogFile('GetMap getHttp map XML');
       xmlStr := httpGet(RiskMeterURL + '?' +RiskMeterQueryStr);
 
       //WriteToLogFile('GetMap Result XML:');
@@ -542,9 +544,10 @@ begin
             MapNode.ChildNodes.FindNode('ImageName').NodeValue;
 
           //get the map
-          WriteToLogFile('GetMapImage Call:');
+          //WriteToLogFile('GetMapImage Call:');
           //WriteToLogFile('MapImageURL: ' + ImageUrl);
           //MapData := FidHTTP.Get(ImageURL);
+          WriteToLogFile('GetMap httpGetStreammap image');
           strm := httpGetStream(ImageURL);
           try
             //strm.SaveToFile('C:\WebServices\FloodServer\mapImage112818orig.jpg');
@@ -807,6 +810,7 @@ var sRetMsg : string;
 //var TempIDHTTP: TIDHTTP;
 begin
   //check subscription service detail using new subscription server.
+  //WriteToLogFile('UserHasAccesss');
   try
     if (Length(CustID) > 0 ) and (Length(Code) > 0) {(compareText(Code, 'FREE') = 0)} then
     begin
@@ -818,6 +822,7 @@ begin
 
            //sRetMsg := TempIDHTTP.Get(WSDL_LOCATION+'AuthenticateCustomer?iCustID='+ CustID + '&sCustPin='+ WS_PIN + '&iServiceID=' + IntToStr(SERVICE_ID));
            //WriteToLogFile(' Start UserHasAccess');
+           WriteToLogFile('UserhasAccess httpFet');
            sRetMsg := httpGet(WSDL_LOCATION+'AuthenticateCustomer?iCustID='+ CustID + '&sCustPin='+ WS_PIN + '&iServiceID=' + IntToStr(SERVICE_ID));
 
            sRetMsg := ParseResult(sRetMsg);
@@ -828,6 +833,7 @@ begin
              Result := 'Error:' + sRetMsg;
              Exit;
            end;
+
          finally
            begin
              //TempIDHTTP.Free;
@@ -895,7 +901,7 @@ begin
      sSearchCriteria :=  FGItxtStreet + ', ' + FGItxtCity + ', ' + FGItxtState + ', ' + FGItxtZip + '-' + FGItxtPlus4;
      //sRetMsg := TempIDHTTP.Get(WSDL_LOCATION+'AddServiceUsage?iCustID='+ FGICustomerId + '&sIPAddress=' +  FGICustomerIP + '&iServiceID=' + IntToStr(SERVICE_ID)
      // + '&sPin='+ WS_PIN + '&iServerUsed=' + IntToStr(gSERVERUSED) + '&sSearchCriteria=' + URLEncode(sSearchCriteria) + '&iTransStatus='+IntToStr(iTransStatus) + '&iActualTransactions=1');
-     WriteToLogFile('Start AddServiceUsage');
+     WriteToLogFile('AddServiceUsage httpGet');
      sRetMsg := httpGet(WSDL_LOCATION+'AddServiceUsage?iCustID='+ FGICustomerId + '&sIPAddress=' +  FGICustomerIP + '&iServiceID=' + IntToStr(SERVICE_ID)
       + '&sPin='+ WS_PIN + '&iServerUsed=' + IntToStr(gSERVERUSED) + '&sSearchCriteria=' + URLEncode(sSearchCriteria) + '&iTransStatus='+IntToStr(iTransStatus) + '&iActualTransactions=1');
    end
@@ -904,6 +910,7 @@ begin
      sSearchCriteria :=  FGMtxtStreet + ', ' + FGMtxtCity + ', ' + FGMtxtState + ', ' + FGMtxtZip + '-' + FGMtxtPlus4;
      //sRetMsg := TempIDHTTP.Get(WSDL_LOCATION+'AddServiceUsage?iCustID='+ FGMCustomerId + '&sIPAddress=' +  FGMCustomerIP + '&iServiceID=' + IntToStr(SERVICE_ID)
      //+ '&sPin='+ WS_PIN + '&iServerUsed=' + IntToStr(gSERVERUSED) + '&sSearchCriteria=' + URLEncode(sSearchCriteria) + '&iTransStatus='+IntToStr(iTransStatus) + '&iActualTransactions=1');
+     WriteToLogFile('AddServiceUsage httpGet');
      sRetMsg := httpGet(WSDL_LOCATION+'AddServiceUsage?iCustID='+ FGMCustomerId + '&sIPAddress=' +  FGMCustomerIP + '&iServiceID=' + IntToStr(SERVICE_ID)
      + '&sPin='+ WS_PIN + '&iServerUsed=' + IntToStr(gSERVERUSED) + '&sSearchCriteria=' + URLEncode(sSearchCriteria) + '&iTransStatus='+IntToStr(iTransStatus) + '&iActualTransactions=1');
    end;
@@ -978,6 +985,10 @@ var
 
   ErrorPOS1, ErrorPOS2: integer;
   ErrMsg: string;
+
+  strm: TMemoryStream;
+  btArray: Array of Byte;
+  ind: integer;
 begin
   FlagError := False;
 
@@ -1027,12 +1038,12 @@ begin
       //instantiate the HTTP client to run HttpGet for getting the map
       //FidHTTP := TidHTTP.Create(self);
 
-      WriteToLogFile('Get Respotted Map Info call:');
+      WriteToLogFile('Get Respotted Map Info httpGet');
       //WriteToLogFile(RiskMeterURL + '?' +RiskMeterQueryStr);
 
       //run the HttpGet to get the XML result into XMLStr
       //XMLStr := FidHTTP.Get(RiskMeterURL + '?' +RiskMeterQueryStr);
-      xmlStr  := httpGet(RiskMeterURL + '?' +RiskMeterQueryStr);
+       xmlStr  := httpGet(RiskMeterURL + '?' +RiskMeterQueryStr);
 
      // WriteToLogFile('Get Respotted Map Info call Result XML:');
      // WriteToLogFile(XmlStr);
@@ -1098,9 +1109,24 @@ begin
 
         //get the map
         //MapData := FidHTTP.Get(ImageURL);
-        WriteToLogFile('Get Respoted mapImage');
-        mapData  := httpGet(imageUrl);
 
+        WriteToLogFile('GetReSpottedMapInfo getHttpStream mapImage');
+        //mapData  := httpGet(imageUrl);
+        strm :=  httpGetStream(ImageUrl);
+        try
+          setLength(btArray,strm.size);
+          strm.Position := 0;
+          try
+            strm.Read(btArray[0], length(btArray));
+          finally
+            if assigned(strm) then strm.Free;
+          end;
+          setLength(mapData, length(btArray));
+          for ind := 0 to length(mapData) - 1 do
+            mapData[ind +1] := AnsiChar(btArray[ind]);
+          finally
+            setLength(btArray,0);
+          end;
         //alert user if map is not there
         if length(MapData) = 0 then
           raise Exception.create('There was a problem creating the map. The address may be incorrect.');
@@ -1164,7 +1190,7 @@ begin
     try
       //instantiate the HTTP client to run HttpGet for getting the map
       //FidHTTP := TidHTTP.Create(self);
-      WriteToLogFile('Get Respotted Map call:');
+      WriteToLogFile('GetReSpottedMapImage httpGet image XML');
       //WriteToLogFile(CdMapURL + '?' +CdMapQueryStr);
       //run the HttpGet to get the XML result into XMLStr
       //XMLStr := FidHTTP.Get(CdMapURL + '?' +CdMapQueryStr);
@@ -1240,13 +1266,16 @@ begin
   httpRequest := CoWinHTTPRequest.Create;
   with httpRequest do
     begin
+      WriteToLogFile('httpGet url: ' + url);
       Open('GET', url, false);
       SetTimeouts(30000, 30000, 30000, 30000);
       WriteToLogFile('httpGetUrl: ' + url);
       send('');          //exception will be catch in the calling function
+      WriteToLogFile('httpget http status: ' + intToStr(status));
       if status <> httpRespOk then
          raise Exception.create('The server: ' + url + 'returns error code ' + intToStr(status));
       result := ResponseText;
+      WritetoLogfile('httpget result: ' + result);
       WriteToLogFile('result: ' + result)
     end;
 end;
@@ -1262,10 +1291,12 @@ begin
   result := TMemoryStream.Create;
   with httpRequest do
     begin
+      WriteToLogFile('httpGetStream: ' + url);
       Open('GET', url, false);
       SetTimeouts(30000, 30000, 30000, 30000);
       WriteToLogFile('httpGetUrl: ' + url);
       send('');          //exception will be catch in the calling function
+      WriteToLogFile('httpGetStream status: ' + intToStr(status));
       if status <> httpRespOk then
          raise Exception.create('The server: ' + url + 'returns error code ' + intToStr(status));
     end;
